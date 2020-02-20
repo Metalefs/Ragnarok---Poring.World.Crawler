@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using Persistency.Database;
 
-namespace BS2.RoboPrecatorio.RoboWeb
+namespace CrawlerBase
 {
     public class CrawlerSelenium
     {
