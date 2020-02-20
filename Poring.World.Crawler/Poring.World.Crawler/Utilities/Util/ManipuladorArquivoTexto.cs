@@ -14,18 +14,5 @@ namespace Utilities.Files
                 tw.WriteLine(texto);
             }
         }
-
-        public static void EscreverArquivoAntigo(string texto, string path)
-        {
-            if (File.Exists(path))
-            {
-                texto = File.ReadAllText(path) + texto;
-            }
-
-            using (TextWriter tw = new StreamWriter(path))
-            {
-                tw.WriteLine(texto);
-            }
-        }
     }
 }
