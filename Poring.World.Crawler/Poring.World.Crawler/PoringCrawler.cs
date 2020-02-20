@@ -8,7 +8,7 @@ using Persistency.Database;
 using Utilities;
 using Utilities.Files;
 using Domain;
-using BS2.RoboPrecatorio.RoboWeb;
+using CrawlerBase;
 using OpenQA.Selenium;
 using System.IO;
 using System.Reflection;
@@ -17,7 +17,7 @@ namespace Poring
 {
     public class PoringCrawler
     {
-        public static string PastaDoExecutavel => @"C:\NChromeDriver";
+        public static string PastaDoExecutavel => @"C:\ChromeDriver";
         private readonly static string URL_Base = Caminhos.URL_Poring_Crawler;
 
         public static CrawlerSelenium Crawler { get; private set; }
@@ -35,23 +35,16 @@ namespace Poring
             DBConnection MongoConnection = new DBConnection();
             try
             {
-                List<Item> Items = GetItemsFromHtml();
+                List<Item> Items = GetItemDivsFromPage();
                 MongoConnection.InserirVarios(Items, "Items");
-                Items.ForEach(Item => Console.WriteLine(Item.Model + " " + Item.Price));
                 ManipuladorArquivoTexto.EscreverArquivo(string.Format("{0} registros inseridos no banco ás {1}", Items.Count, DateTime.Now.ToShortTimeString() + " - " + DateTime.Now.ToShortDateString()), Caminhos.CaminhoLog);
-                ManipuladorArquivoTexto.EscreverArquivo(string.Format("{0} registros inseridos no banco ás {1}", Items.Count, DateTime.Now.ToShortTimeString() + " - " + DateTime.Now.ToShortDateString()), Caminhos.CaminhoItens);
+                //ManipuladorArquivoTexto.EscreverArquivo(string.Format("{0}" Items.ToString() ), Caminhos.CaminhoItens);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
             Crawler.Close();
-        }
-
-        private static List<Item> GetItemsFromHtml()
-        {
-            List<Item> ItemDivs = GetItemDivsFromPage();
-            return ItemDivs;     
         }
 
         private static List<Item> GetItemDivsFromPage()
@@ -78,11 +71,9 @@ namespace Poring
                     Stock = Values[6];
                     Buyers = Values[8];
                     SnapEnd = Values[10];
-                    Console.WriteLine($"{Nome}");
                     string[] NumerosPreco = Regex.Split(Preco, Patterns.NumberPattern);
                     string PrecoSemVirgula = string.Join("", NumerosPreco);
                     float PrecoFinal = float.Parse(PrecoSemVirgula);
-                    Console.WriteLine($"{PrecoFinal}");
                     Item Item = new Item
                     {
                         Model = Nome,
@@ -94,7 +85,6 @@ namespace Poring
                         //ImageURL = itens[i].FindElement(By.TagName("img")).GetAttribute("src")
                     };
                     Items.Add(Item);
-                    Console.WriteLine(Item.Model);
                 }
                 catch (Exception) { continue; }
             }
